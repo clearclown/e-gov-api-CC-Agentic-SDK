@@ -30,27 +30,35 @@
 
 <div align="center">
 
-### API ドキュメント (Swagger UI)
+### 💬 フロントエンド - チャットUI
+
+![Frontend Chat UI](docs/pics/frontend-chat-ui.png)
+
+*Next.js 15 + TypeScript による AI チャットインターフェース*
+
+---
+
+### 🔄 マルチLLMプロバイダー選択
+
+![Provider Selector](docs/pics/provider-selector.png)
+
+*Anthropic Claude / DeepSeek AI / Google Gemini をUIから切り替え*
+
+---
+
+### 📚 API ドキュメント (Swagger UI)
 
 ![API Documentation](docs/pics/api-docs.png)
 
-*FastAPIによる自動生成APIドキュメント*
+*FastAPI による自動生成 API ドキュメント*
 
 ---
 
-### 法令検索のレスポンス例
+### 🤖 Agent API エンドポイント
 
-![Law Search Response](docs/pics/law-search.png)
+![Agent API Endpoints](docs/pics/api-agent-endpoints.png)
 
-*キーワード「表現の自由」での検索結果*
-
----
-
-### 判例検索のレスポンス例
-
-![Case Search Response](docs/pics/case-search.png)
-
-*キーワード「表現の不自由展かんさい」での判例検索結果*
+*Claude Agent SDK 統合エンドポイント*
 
 </div>
 
