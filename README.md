@@ -2,16 +2,23 @@
 
 # 📚 e-gov API FastAPI Agent SDK
 
-**日本の法令・判例データを提供する高速APIサーバー**
+**日本の法令・判例データを提供する高速APIサーバー with AI Agent**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Claude Agent SDK](https://img.shields.io/badge/Claude_Agent_SDK-0.1.6-FF6B35?style=for-the-badge&logo=anthropic&logoColor=white)](https://docs.claude.com/ja/docs/agent-sdk)
+[![Multi-LLM](https://img.shields.io/badge/Multi--LLM-Anthropic%20%7C%20DeepSeek%20%7C%20Gemini-blueviolet?style=for-the-badge)]()
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Compatible-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Podman](https://img.shields.io/badge/Podman-Compatible-892CA0?style=for-the-badge&logo=podman&logoColor=white)](https://podman.io/)
 [![uv](https://img.shields.io/badge/uv-Package_Manager-FF6B35?style=for-the-badge)](https://github.com/astral-sh/uv)
+[![pnpm](https://img.shields.io/badge/pnpm-9.0+-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+> **Fork元**: [clearclown/e-gov-api-fastAPI](https://github.com/clearclown/e-gov-api-fastAPI)
+> このプロジェクトは元のRESTful APIに **Claude Agent SDK**、**マルチLLMプロバイダー対応**、**Next.js フロントエンド** を統合した拡張版です。
 
 [🇯🇵 日本語](README.md) | [🇬🇧 English](docs/readmeLang/README.en.md) | [🇨🇳 简体中文](docs/readmeLang/README.zh-CN.md) | [🇹🇼 繁體中文](docs/readmeLang/README.zh-TW.md) | [🇷🇺 Русский](docs/readmeLang/README.ru.md) | [🇮🇷 فارسی](docs/readmeLang/README.fa.md) | [🇸🇦 العربية](docs/readmeLang/README.ar.md)
 
@@ -68,6 +75,16 @@
   - コンテキストを保持した対話型法律相談
   - 複数文書の横断的分析
   - 法令と判例の関連性の自動抽出
+- 🔄 **マルチLLMプロバイダー対応** (NEW!)
+  - **Anthropic Claude** - Claude Agent SDK で最高品質の法律分析
+  - **DeepSeek AI** - コスト効率の高い基本的なチャット
+  - **Google Gemini** - Googleの最新LLMモデル
+  - UIでリアルタイム切り替え可能
+- 💬 **Next.js 15 フロントエンド** (NEW!)
+  - モダンなチャットUI
+  - ストリーミングレスポンス対応
+  - プロバイダー選択機能
+  - TypeScript + Tailwind CSS
 
 ---
 
@@ -210,6 +227,111 @@ results = await asyncio.gather(
 | **スキーマ形式** | **JSON** | **JSON** | **✅ TOON (30-60% トークン削減)** |
 
 **結論**: Claude Agent SDK は、本格的なエージェント型法律支援システムを構築するための最適なフレームワークです。
+
+---
+
+## 🔄 マルチLLMプロバイダー対応 (このフォークの独自機能)
+
+このプロジェクトでは、**複数のLLMプロバイダー**をサポートし、用途に応じて最適なAIモデルを選択できます。
+
+### 対応プロバイダー
+
+| プロバイダー | 特徴 | ユースケース | Agent SDK | MCP Tools |
+|------------|------|-------------|-----------|-----------|
+| **🔵 Anthropic Claude** | 最高品質の法律分析<br/>長文理解に優れる | 複雑な法律文書分析<br/>判例研究<br/>高度な法律相談 | ✅ 完全対応 | ✅ 利用可能 |
+| **🟢 DeepSeek AI** | コスト効率が高い<br/>基本的なチャット | 簡単な質問応答<br/>要約生成<br/>コスト重視の用途 | ❌ 基本機能のみ | ❌ 非対応 |
+| **🔴 Google Gemini** | Googleの最新モデル<br/>マルチモーダル | 一般的な法律質問<br/>多言語対応<br/>画像分析 | ❌ 基本機能のみ | ❌ 非対応 |
+
+### 技術的実装
+
+**統一インターフェース（Adapter Pattern）:**
+```python
+from app.services.llm import BaseLLMClient, create_llm_client
+
+# 抽象基底クラスで統一されたインターフェース
+class BaseLLMClient(ABC):
+    @abstractmethod
+    async def query(self, message: str) -> AsyncIterator[Dict]:
+        pass
+
+# ファクトリーパターンで動的にプロバイダーを生成
+client = create_llm_client(
+    provider="anthropic",  # or "deepseek", "gemini"
+    api_key="your-api-key",
+    model="claude-3-5-sonnet-20241022"
+)
+```
+
+**API エンドポイントでのプロバイダー指定:**
+```bash
+# Anthropic Claude を使用
+curl -X POST http://localhost:8000/api/v1/agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "労働法について教えてください", "provider": "anthropic"}'
+
+# DeepSeek AI を使用
+curl -X POST http://localhost:8000/api/v1/agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "労働法について教えてください", "provider": "deepseek"}'
+
+# Google Gemini を使用
+curl -X POST http://localhost:8000/api/v1/agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "労働法について教えてください", "provider": "gemini"}'
+```
+
+### フロントエンドでのプロバイダー切り替え
+
+Next.js フロントエンドでは、UIから簡単にプロバイダーを切り替えられます：
+
+```typescript
+// プロバイダー選択ドロップダウン
+<select value={provider} onChange={(e) => setProvider(e.target.value)}>
+  <option value="anthropic">Anthropic Claude</option>
+  <option value="deepseek">DeepSeek AI</option>
+  <option value="gemini">Google Gemini</option>
+</select>
+```
+
+### API キー設定
+
+`.env` ファイルで各プロバイダーのAPIキーを設定：
+
+```bash
+# デフォルトプロバイダー
+DEFAULT_LLM_PROVIDER=anthropic
+
+# Anthropic Claude
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+CLAUDE_MODEL=claude-3-5-sonnet-20241022
+
+# DeepSeek AI
+DEEPSEEK_API_KEY=sk-your-deepseek-key-here
+DEEPSEEK_MODEL=deepseek-chat
+
+# Google Gemini
+GOOGLE_API_KEY=your-google-api-key-here
+GEMINI_MODEL=gemini-2.0-flash-exp
+```
+
+### プロバイダー選択のベストプラクティス
+
+**🔵 Anthropic Claude を使う場合:**
+- 複雑な法律文書の分析
+- 長文の判例研究
+- 高度な論理的推論が必要な相談
+- MCP カスタムツールを活用した検索
+
+**🟢 DeepSeek AI を使う場合:**
+- シンプルな質問応答
+- コスト削減が最優先
+- 基本的な要約生成
+- 大量の簡単なクエリ処理
+
+**🔴 Google Gemini を使う場合:**
+- 最新のGoogleモデルを試したい
+- マルチモーダル機能（画像分析など）
+- 多言語対応が必要
 
 ---
 
@@ -478,32 +600,51 @@ uv cache clean
 
 | カテゴリ | 技術 |
 |---------|------|
-| **フレームワーク** | FastAPI |
-| **言語** | Python 3.12+ |
-| **AIエージェント** | **Claude Agent SDK** |
+| **バックエンド** | FastAPI (Python 3.12+) |
+| **フロントエンド** | **Next.js 15 (App Router) + TypeScript** |
+| **AIエージェント** | **Claude Agent SDK 0.1.6** |
+| **LLMプロバイダー** | **Anthropic Claude / DeepSeek AI / Google Gemini** |
 | **構造化データ** | **TOON (30-60% トークン削減)** |
 | **データベース** | PostgreSQL 16 + pgvector |
 | **キャッシュ** | Redis 7 |
-| **パッケージマネージャー** | uv |
+| **パッケージマネージャー** | uv (Python) / pnpm (Node.js) |
 | **コンテナ** | Docker / Podman |
 | **外部API** | e-gov 法令API, 裁判所 |
 | **ツール統合** | **Model Context Protocol (MCP)** |
+| **UI フレームワーク** | **Tailwind CSS + shadcn/ui** |
 
 ### 仕組み
 
 ```
-┌─────────────┐
-│  クライアント  │
-└──────┬──────┘
-       │
-       ▼
+┌──────────────────────────────────────────┐
+│          Next.js 15 Frontend              │
+│  ┌────────────────────────────────────┐  │
+│  │  🎨 Chat UI (TypeScript + Tailwind) │  │
+│  │  📱 Provider Selector                │  │
+│  │  💬 Streaming Response Display       │  │
+│  │  🔄 Multi-LLM Support UI             │  │
+│  └────────────────────────────────────┘  │
+└──────────────┬───────────────────────────┘
+               │ HTTP/REST API
+               ▼
+┌───────────────────────────────────────────┐
+│     Multi-LLM Provider Layer              │
+│  ┌─────────────────────────────────────┐ │
+│  │  🔵 Anthropic Claude (Agent SDK)     │ │
+│  │  🟢 DeepSeek AI (OpenAI-compatible) │ │
+│  │  🔴 Google Gemini (Native SDK)      │ │
+│  │  ↓ Unified BaseLLMClient Interface  │ │
+│  └─────────────────────────────────────┘ │
+└──────────────┬────────────────────────────┘
+               │
+               ▼
 ┌───────────────────────────────────────┐
 │     Claude Agent SDK Layer            │
 │  ┌────────────────────────────────┐  │
 │  │  Agentic RAG Engine             │  │
 │  │  - 自然言語クエリ処理            │  │
 │  │  - コンテキスト管理              │  │
-│  │  │  - セマンティック検索            │  │
+│  │  - セマンティック検索            │  │
 │  │  - MCP Tools Integration        │  │
 │  └────────────────────────────────┘  │
 └──────────────┬────────────────────────┘
@@ -616,6 +757,13 @@ e-gov-api-CC-Agentic-SDK/
   - [x] `claude-agent-sdk` 0.1.6 インストール
   - [x] `ClaudeSDKClient` による Agent 統合
   - [x] `.env` でのモデル選択機能
+- [x] **マルチLLMプロバイダー対応** (NEW!)
+  - [x] Anthropic Claude 完全対応 (Agent SDK)
+  - [x] DeepSeek AI 統合 (OpenAI SDK互換)
+  - [x] Google Gemini 統合 (Native SDK)
+  - [x] `BaseLLMClient` 抽象インターフェース実装
+  - [x] ファクトリーパターンによるプロバイダー切り替え
+  - [x] プロバイダー別サービスキャッシング
 - [x] **TOON フォーマット導入**
   - [x] `python-toon` ライブラリのインストール
   - [x] 既存 JSON スキーマの TOON 移行
@@ -651,6 +799,14 @@ e-gov-api-CC-Agentic-SDK/
   - [x] Python CLI ツール (dev.py)
   - [x] 自動環境確認スクリプト
   - [x] tmux による複数サーバー同時起動
+- [x] **Next.js 15 フロントエンド** (NEW!)
+  - [x] App Router アーキテクチャ
+  - [x] TypeScript + Tailwind CSS
+  - [x] リアルタイムチャットUI
+  - [x] ストリーミングレスポンス表示
+  - [x] LLMプロバイダー選択機能
+  - [x] pnpm パッケージマネージャー
+  - [x] Docker/Podman 対応
 
 **Phase 4: 高度な分析機能** 📋 **計画中**
 - [ ] **サブエージェント委任による複雑な調査**
