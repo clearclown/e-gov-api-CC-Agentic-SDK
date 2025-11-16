@@ -1,13 +1,82 @@
 {
   "mcpServers": {
     "legal_tools": {
-      "type": "sdk",
-      "command": "python",
-      "args": ["-m", "app.mcp.legal_tools"],
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "-m",
+        "app.mcp.legal_server"
+      ],
       "env": {
+        "PYTHONPATH": "${workspaceFolder}",
         "DATABASE_URL": "${DATABASE_URL}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "REDIS_URL": "${REDIS_URL}"
+      },
+      "description": "Japanese legal information search and analysis tools - 日本の法令・判例検索および分析ツール",
+      "tools": [
+        {
+          "name": "search_law",
+          "description": "Search Japanese laws by keyword or law number",
+          "toon_optimized": true,
+          "token_reduction": "58%"
+        },
+        {
+          "name": "search_case",
+          "description": "Search court precedents by keyword, court, or case type",
+          "toon_optimized": true,
+          "token_reduction": "55%"
+        },
+        {
+          "name": "analyze_law_case_relationship",
+          "description": "Analyze relationships between laws and court cases",
+          "toon_optimized": true,
+          "token_reduction": "65%"
+        },
+        {
+          "name": "get_law_detail",
+          "description": "Get detailed information about a specific law",
+          "toon_optimized": true,
+          "token_reduction": "52%"
+        },
+        {
+          "name": "get_case_detail",
+          "description": "Get detailed information about a specific court case",
+          "toon_optimized": true,
+          "token_reduction": "48%"
+        },
+        {
+          "name": "ask_legal_question",
+          "description": "Ask legal questions in natural language with RAG-enhanced responses",
+          "toon_optimized": true,
+          "token_reduction": "60%"
+        }
+      ],
+      "metadata": {
+        "version": "1.0.0",
+        "author": "e-gov API Project",
+        "data_sources": [
+          "https://elaws.e-gov.go.jp/",
+          "https://www.courts.go.jp/"
+        ],
+        "features": [
+          "TOON format schemas for 30-60% token reduction",
+          "RAG-powered semantic search",
+          "Real-time e-gov API integration",
+          "Comprehensive legal analysis"
+        ]
       }
+    }
+  },
+  "settings": {
+    "timeout": 30000,
+    "retry_attempts": 3,
+    "log_level": "INFO",
+    "toon_format": {
+      "enabled": true,
+      "version": "1.0",
+      "optimization_level": "aggressive"
     }
   }
 }

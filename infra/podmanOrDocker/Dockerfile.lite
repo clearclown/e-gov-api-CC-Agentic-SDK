@@ -35,7 +35,9 @@ RUN uv venv && \
     anthropic \
     python-multipart \
     pgvector \
-    networkx
+    networkx \
+    openai \
+    google-generativeai
 
 EXPOSE 8000
 

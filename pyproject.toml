@@ -23,6 +23,12 @@ dependencies = [
     "networkx>=3.0",
     "anthropic>=0.39.0",
     "pgvector>=0.2.0",
+    # Claude Agent SDK & TOON (Phase 3)
+    "claude-agent-sdk>=0.1.0",
+    "python-toon>=0.1.0",
+    # Multi-LLM Support
+    "openai>=1.0.0",  # For DeepSeek AI (OpenAI-compatible API)
+    "google-generativeai>=0.3.0",  # For Google Gemini
 ]
 
 [project.optional-dependencies]

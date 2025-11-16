@@ -15,7 +15,7 @@ from app.core.config import settings
 from app.core.cache import law_cache
 from app.core.database import db
 from app.core.exceptions import EGovAPIError
-from app.api.endpoints import laws, cases, analytics
+from app.api.endpoints import laws, cases, analytics, agent
 
 # AI機能はオプション（sentence_transformers等がインストールされている場合のみ）
 try:
@@ -210,6 +210,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 app.include_router(laws.router)
 app.include_router(cases.router)
 app.include_router(analytics.router)
+app.include_router(agent.router)  # Agent API (Claude SDK)
 
 # AI機能のルーターは依存関係がある場合のみ登録
 if AI_FEATURES_AVAILABLE:

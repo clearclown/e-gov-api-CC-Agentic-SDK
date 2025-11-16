@@ -69,8 +69,20 @@ class Settings(BaseSettings):
     # Database Settings (Phase 3)
     database_url: str = "postgresql://postgres:postgres@localhost:5432/legal_db"
 
-    # Anthropic API Settings (Phase 3)
+    # LLM Provider Settings (Phase 3)
+    default_llm_provider: str = "anthropic"  # Default LLM provider (anthropic, deepseek, gemini)
+
+    # Anthropic API Settings
     anthropic_api_key: Optional[str] = None
+    claude_model: str = "claude-3-5-sonnet-20241022"  # Claude model for Agent SDK
+
+    # DeepSeek API Settings
+    deepseek_api_key: Optional[str] = None
+    deepseek_model: str = "deepseek-chat"  # DeepSeek model
+
+    # Google Gemini API Settings
+    google_api_key: Optional[str] = None
+    gemini_model: str = "gemini-2.0-flash-exp"  # Gemini model
 
     # Embedding Model Settings (Phase 3)
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
